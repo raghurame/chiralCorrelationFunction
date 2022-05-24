@@ -339,7 +339,7 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 
 void computeCorrelation (DIHEDRAL_ENTRIES *dihedral, int nDihedrals, int nTimeframes_dump, CHIRAL_CORRELATION **corr)
 {
-	int arrayIndex1, arrayIndex2, *nItems;
+	int arrayIndex1, arrayIndex2, *nItems, chirality1, chirality2;
 	nItems = (int *) calloc (nTimeframes_dump, sizeof (int));
 
 	for (int i = 0; i < nTimeframes_dump; ++i)
@@ -364,21 +364,25 @@ void computeCorrelation (DIHEDRAL_ENTRIES *dihedral, int nDihedrals, int nTimefr
 				(*corr)[lag].correlationGauchePlus += (float)dihedral[arrayIndex1].isGauchePlus * (float)dihedral[arrayIndex2].isGauchePlus;
 				(*corr)[lag].correlationGaucheMinus += (float)dihedral[arrayIndex1].isGaucheMinus * (float)dihedral[arrayIndex2].isGaucheMinus;
 
-				(*corr)[lag].correlationTransTrans += 
-				(float)(dihedral[arrayIndex1].isTransTrans_previous + dihedral[arrayIndex1].isTransTrans_next) * 
-				(float)(dihedral[arrayIndex2].isTransTrans_previous + dihedral[arrayIndex2].isTransTrans_next);
+				chirality1 = 0; chirality2 = 0;
+				if (dihedral[arrayIndex1].isTransTrans_previous == 1 || dihedral[arrayIndex1].isTransTrans_next == 1) chirality1 = 1;
+				if (dihedral[arrayIndex2].isTransTrans_previous == 1 || dihedral[arrayIndex2].isTransTrans_next == 1) chirality2 = 1;
+				(*corr)[lag].correlationTransTrans += (float)chirality1 * (float)chirality2;
 
-				(*corr)[lag].correlationTransGaucheMinus += 
-				(float)(dihedral[arrayIndex1].isTransGaucheMinus_previous + dihedral[arrayIndex1].isTransGaucheMinus_next) * 
-				(float)(dihedral[arrayIndex2].isTransGaucheMinus_previous + dihedral[arrayIndex2].isTransGaucheMinus_next);
+				chirality1 = 0; chirality2 = 0;
+				if (dihedral[arrayIndex1].isTransGaucheMinus_previous == 1 || dihedral[arrayIndex1].isTransGaucheMinus_next == 1) chirality1 = 1;
+				if (dihedral[arrayIndex2].isTransGaucheMinus_previous == 1 || dihedral[arrayIndex2].isTransGaucheMinus_next == 1) chirality2 = 1;
+				(*corr)[lag].correlationTransGaucheMinus += (float)chirality1 * (float)chirality2;
 
-				(*corr)[lag].correlationTransGauchePlus += 
-				(float)(dihedral[arrayIndex1].isTransGauchePlus_previous + dihedral[arrayIndex1].isTransGauchePlus_next) * 
-				(float)(dihedral[arrayIndex2].isTransGauchePlus_previous + dihedral[arrayIndex2].isTransGauchePlus_next);
+				chirality1 = 0; chirality2 = 0;
+				if (dihedral[arrayIndex1].isTransGauchePlus_previous == 1 || dihedral[arrayIndex1].isTransGauchePlus_next == 1) chirality1 = 1;
+				if (dihedral[arrayIndex2].isTransGauchePlus_previous == 1 || dihedral[arrayIndex2].isTransGauchePlus_next == 1) chirality2 = 1;
+				(*corr)[lag].correlationTransGauchePlus += (float)chirality1 * (float)chirality2;
 
-				(*corr)[lag].correlationGaucheGauche += 
-				(float)(dihedral[arrayIndex1].isGaucheGauche_previous + dihedral[arrayIndex1].isGaucheGauche_next) * 
-				(float)(dihedral[arrayIndex2].isGaucheGauche_previous + dihedral[arrayIndex2].isGaucheGauche_next);
+				chirality1 = 0; chirality2 = 0;
+				if (dihedral[arrayIndex1].isGaucheGauche_previous == 1 || dihedral[arrayIndex1].isGaucheGauche_next == 1) chirality1 = 1;
+				if (dihedral[arrayIndex2].isGaucheGauche_previous == 1 || dihedral[arrayIndex2].isGaucheGauche_next == 1) chirality2 = 1;
+				(*corr)[lag].correlationGaucheGauche += (float)chirality1 * (float)chirality2;
 
 				nItems[lag]++;
 			}
