@@ -15,9 +15,10 @@ int main(int argc, char const *argv[])
 		exit (1);
 	}
 
-	FILE *inputDump, *inputDihedral;
+	FILE *inputDump, *inputDihedral, *output;
 	inputDump = fopen (argv[1], "r");
 	inputDihedral = fopen (argv[2], "r");
+	output = fopen ("chiralCorrelation.output", "w");
 
 	int nAtoms = getNAtoms (inputDump), nDihedrals = getNDihedrals (inputDihedral), nTimeframes_dump = countTimeframes_dump (inputDump, nAtoms), nTimeframes_dihedral = countTimeframes_dihedral (inputDihedral, nDihedrals);
 
@@ -62,7 +63,7 @@ int main(int argc, char const *argv[])
 
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
-		printf("%f %f %f %f %f %f %f\n", 
+		fprintf(output, "%f %f %f %f %f %f %f\n", 
 			logf (corr[i].correlationTrans), 
 			logf (corr[i].correlationGauchePlus), 
 			logf (corr[i].correlationGaucheMinus), 
@@ -70,12 +71,13 @@ int main(int argc, char const *argv[])
 			logf (corr[i].correlationTransGaucheMinus), 
 			logf (corr[i].correlationTransGauchePlus), 
 			logf (corr[i].correlationGaucheGauche));
-		usleep (100000);
 	}
 
 	free (dump);
 	free (dihedral);
+	free (corr);
 	fclose (inputDump);
 	fclose (inputDihedral);
+	fclose (output);
 	return 0;
 }
