@@ -63,13 +63,13 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
 		printf("%f %f %f %f %f %f %f\n", 
-			corr[i].correlationTrans, 
-			corr[i].correlationGauchePlus, 
-			corr[i].correlationGaucheMinus, 
-			corr[i].correlationTransTrans, 
-			corr[i].correlationTransGaucheMinus, 
-			corr[i].correlationTransGauchePlus, 
-			corr[i].correlationGaucheGauche);
+			logf (corr[i].correlationTrans), 
+			logf (corr[i].correlationGauchePlus), 
+			logf (corr[i].correlationGaucheMinus), 
+			logf (corr[i].correlationTransTrans), 
+			logf (corr[i].correlationTransGaucheMinus), 
+			logf (corr[i].correlationTransGauchePlus), 
+			logf (corr[i].correlationGaucheGauche));
 		usleep (100000);
 	}
 
