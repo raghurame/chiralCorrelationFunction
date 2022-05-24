@@ -48,18 +48,30 @@ int main(int argc, char const *argv[])
 	rewind (inputDihedral);
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
+		printf("Reading dihedral frame: %d/%d               \r", i, nTimeframes_dump);
+		fflush (stdout);
 		dump = readDump (inputDump, nAtoms, &currentTimestep_dump);
 		readDihedral (&dihedral, inputDihedral, dump, i, nDihedrals, nAtoms, currentTimestep_dump, &currentTimestep_dihedral);
 	}
 
-	// Calculating correlation function
-	int *lHandCorrelation, *rHandCorrelation, *exCoilCorrelation, *coilCorrelation;
-	lHandCorrelation = (int *) malloc (nTimeframes_dump * sizeof (int));
-	rHandCorrelation = (int *) malloc (nTimeframes_dump * sizeof (int));
-	exCoilCorrelation = (int *) malloc (nTimeframes_dump * sizeof (int));
-	coilCorrelation = (int *) malloc (nTimeframes_dump * sizeof (int));
+	printf("\n");
 
-	computeCorrelation (dihedral, nDihedrals, nTimeframes_dump, &lHandCorrelation, &rHandCorrelation, &exCoilCorrelation, &coilCorrelation);
+	CHIRAL_CORRELATION *corr;
+	corr = (CHIRAL_CORRELATION *) malloc (nTimeframes_dump * sizeof (CHIRAL_CORRELATION));
+	computeCorrelation (dihedral, nDihedrals, nTimeframes_dump, &corr);
+
+	for (int i = 0; i < nTimeframes_dump; ++i)
+	{
+		printf("%f %f %f %f %f %f %f\n", 
+			corr[i].correlationTrans, 
+			corr[i].correlationGauchePlus, 
+			corr[i].correlationGaucheMinus, 
+			corr[i].correlationTransTrans, 
+			corr[i].correlationTransGaucheMinus, 
+			corr[i].correlationTransGauchePlus, 
+			corr[i].correlationGaucheGauche);
+		usleep (100000);
+	}
 
 	free (dump);
 	free (dihedral);

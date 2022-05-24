@@ -19,6 +19,7 @@ typedef struct dihedralEntries
 typedef struct correlation
 {
 	float correlationTrans, correlationGauchePlus, correlationGaucheMinus;
+	float correlationTransTrans, correlationTransGaucheMinus, correlationTransGauchePlus, correlationGaucheGauche;
 } CHIRAL_CORRELATION;
 
 #endif

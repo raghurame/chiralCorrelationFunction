@@ -57,8 +57,14 @@ int countTimeframes_dump (FILE *inputDump, int nAtoms)
 		nLines++;
 
 		if (strstr (lineString, "ITEM: TIMESTEP"))
+		{
 			nTimeframes++;
+			printf("Counting dump timeframes: %d        \r", nTimeframes);
+			fflush (stdout);			
+		}
 	}
+
+	printf("\n");
 
 	if ((nLines / (nAtoms + 9)) == nTimeframes)
 		return nTimeframes;
@@ -77,8 +83,14 @@ int countTimeframes_dihedral (FILE *inputDihedral, int nDihedrals)
 		nLines++;
 
 		if (strstr (lineString, "ITEM: TIMESTEP"))
+		{
 			nTimeframes++;
+			printf("Counting dihedral timeframes: %d         \r", nTimeframes);
+			fflush (stdout);
+		}
 	}
+
+	printf("\n");
 
 	if ((nLines / (nDihedrals + 9)) == nTimeframes)
 		return nTimeframes;
@@ -144,7 +156,13 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 			for (int i = 0; i < nDihedrals; ++i)
 			{
 				fgets (lineString, 2000, inputDihedral);
-				sscanf (lineString, "%d %f %d %d %d %d\n", &dihTemp[i].id, &dihTemp[i].angle, &dihTemp[i].atom1, &dihTemp[i].atom2, &dihTemp[i].atom3, &dihTemp[i].atom4);
+				sscanf (lineString, "%d %f %d %d %d %d\n", 
+					&dihTemp[i].id, 
+					&dihTemp[i].angle, 
+					&dihTemp[i].atom1, 
+					&dihTemp[i].atom2, 
+					&dihTemp[i].atom3, 
+					&dihTemp[i].atom4);
 			}
 
 			goto processFurther;
@@ -193,7 +211,17 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 		else (*dihedral)[arrayIndex].isBackbone = 0;
 
 		// Resetting all of the values before assigning '1'
-		(*dihedral)[arrayIndex].isGaucheMinus = 0; (*dihedral)[arrayIndex].isGauchePlus = 0; (*dihedral)[arrayIndex].isTrans = 0; (*dihedral)[arrayIndex].isTransTrans_previous = 0; (*dihedral)[arrayIndex].isTransGauchePlus_previous = 0; (*dihedral)[arrayIndex].isTransGaucheMinus_previous = 0; (*dihedral)[arrayIndex].isGaucheGauche_previous = 0; (*dihedral)[arrayIndex].isTransTrans_next = 0; (*dihedral)[arrayIndex].isTransGauchePlus_next = 0; (*dihedral)[arrayIndex].isTransGaucheMinus_next = 0; (*dihedral)[arrayIndex].isGaucheGauche_next = 0;
+		(*dihedral)[arrayIndex].isGaucheMinus = 0; 
+		(*dihedral)[arrayIndex].isGauchePlus = 0; 
+		(*dihedral)[arrayIndex].isTrans = 0; 
+		(*dihedral)[arrayIndex].isTransTrans_previous = 0; 
+		(*dihedral)[arrayIndex].isTransGauchePlus_previous = 0; 
+		(*dihedral)[arrayIndex].isTransGaucheMinus_previous = 0; 
+		(*dihedral)[arrayIndex].isGaucheGauche_previous = 0; 
+		(*dihedral)[arrayIndex].isTransTrans_next = 0; 
+		(*dihedral)[arrayIndex].isTransGauchePlus_next = 0; 
+		(*dihedral)[arrayIndex].isTransGaucheMinus_next = 0; 
+		(*dihedral)[arrayIndex].isGaucheGauche_next = 0;
 
 		if (((*dihedral)[arrayIndex].angle < -38) && ((*dihedral)[arrayIndex].angle > -116)) (*dihedral)[arrayIndex].isGaucheMinus = 1;
 		else if (((*dihedral)[arrayIndex].angle > 34) && ((*dihedral)[arrayIndex].angle < 115)) (*dihedral)[arrayIndex].isGauchePlus = 1;
@@ -227,51 +255,61 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 					// Checking for TT conformation
 					if ((*dihedral)[arrayIndex].isTrans == 1 && (*dihedral)[arrayIndex1].isTrans == 1 && arrayIndex1 > arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransTrans_next = 1; (*dihedral)[arrayIndex1].isTransTrans_previous = 1;
+						(*dihedral)[arrayIndex].isTransTrans_next = 1; 
+						(*dihedral)[arrayIndex1].isTransTrans_previous = 1;
 					}
 					if ((*dihedral)[arrayIndex].isTrans == 1 && (*dihedral)[arrayIndex1].isTrans == 1 && arrayIndex1 < arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransTrans_previous = 1; (*dihedral)[arrayIndex1].isTransTrans_next = 1;
+						(*dihedral)[arrayIndex].isTransTrans_previous = 1; 
+						(*dihedral)[arrayIndex1].isTransTrans_next = 1;
 					}
 
 					// Checking for TG+ conformation
 					if ((*dihedral)[arrayIndex].isTrans == 1 && (*dihedral)[arrayIndex1].isGauchePlus == 1 && arrayIndex1 > arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGauchePlus_next = 1; (*dihedral)[arrayIndex1].isTransGauchePlus_previous = 1;
+						(*dihedral)[arrayIndex].isTransGauchePlus_next = 1; 
+						(*dihedral)[arrayIndex1].isTransGauchePlus_previous = 1;
 					}
 					if ((*dihedral)[arrayIndex].isTrans == 1 && (*dihedral)[arrayIndex1].isGauchePlus == 1 && arrayIndex1 < arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGauchePlus_previous = 1; (*dihedral)[arrayIndex1].isTransGauchePlus_next = 1;
+						(*dihedral)[arrayIndex].isTransGauchePlus_previous = 1; 
+						(*dihedral)[arrayIndex1].isTransGauchePlus_next = 1;
 					}
 
 					// Checking for G+T conformation
 					if ((*dihedral)[arrayIndex].isGauchePlus == 1 && (*dihedral)[arrayIndex1].isTrans == 1 && arrayIndex1 > arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGauchePlus_next = 1; (*dihedral)[arrayIndex1].isTransGauchePlus_previous = 1;
+						(*dihedral)[arrayIndex].isTransGauchePlus_next = 1; 
+						(*dihedral)[arrayIndex1].isTransGauchePlus_previous = 1;
 					}
 					if ((*dihedral)[arrayIndex].isGauchePlus == 1 && (*dihedral)[arrayIndex1].isTrans == 1 && arrayIndex1 < arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGauchePlus_previous = 1; (*dihedral)[arrayIndex1].isTransGauchePlus_next = 1;
+						(*dihedral)[arrayIndex].isTransGauchePlus_previous = 1; 
+						(*dihedral)[arrayIndex1].isTransGauchePlus_next = 1;
 					}
 
 					// Checking for TG- conformation
 					if ((*dihedral)[arrayIndex].isTrans == 1 && (*dihedral)[arrayIndex1].isGaucheMinus == 1 && arrayIndex1 > arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGaucheMinus_next = 1; (*dihedral)[arrayIndex1].isTransGaucheMinus_previous = 1;
+						(*dihedral)[arrayIndex].isTransGaucheMinus_next = 1; 
+						(*dihedral)[arrayIndex1].isTransGaucheMinus_previous = 1;
 					}
 					if ((*dihedral)[arrayIndex].isTrans == 1 && (*dihedral)[arrayIndex1].isGaucheMinus == 1 && arrayIndex1 < arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGaucheMinus_previous = 1; (*dihedral)[arrayIndex1].isTransGaucheMinus_next = 1;
+						(*dihedral)[arrayIndex].isTransGaucheMinus_previous = 1; 
+						(*dihedral)[arrayIndex1].isTransGaucheMinus_next = 1;
 					}
 
 					// Checking for G-T conformation
 					if ((*dihedral)[arrayIndex].isGaucheMinus == 1 && (*dihedral)[arrayIndex1].isTrans == 1 && arrayIndex1 > arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGaucheMinus_next = 1; (*dihedral)[arrayIndex1].isTransGaucheMinus_previous = 1;
+						(*dihedral)[arrayIndex].isTransGaucheMinus_next = 1; 
+						(*dihedral)[arrayIndex1].isTransGaucheMinus_previous = 1;
 					}
 					if ((*dihedral)[arrayIndex].isGaucheMinus == 1 && (*dihedral)[arrayIndex1].isTrans == 1 && arrayIndex1 < arrayIndex)
 					{
-						(*dihedral)[arrayIndex].isTransGaucheMinus_previous = 1; (*dihedral)[arrayIndex1].isTransGaucheMinus_next = 1;
+						(*dihedral)[arrayIndex].isTransGaucheMinus_previous = 1; 
+						(*dihedral)[arrayIndex1].isTransGaucheMinus_next = 1;
 					}
 
 					// Checking for G(+/-)G(+/-) conformation
@@ -284,11 +322,13 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 					{
 						if (arrayIndex1 > arrayIndex)
 						{
-							(*dihedral)[arrayIndex].isGaucheGauche_next = 1; (*dihedral)[arrayIndex1].isGaucheGauche_previous = 1;
+							(*dihedral)[arrayIndex].isGaucheGauche_next = 1; 
+							(*dihedral)[arrayIndex1].isGaucheGauche_previous = 1;
 						}
 						else if (arrayIndex1 < arrayIndex)
 						{
-							(*dihedral)[arrayIndex].isGaucheGauche_previous = 1; (*dihedral)[arrayIndex1].isGaucheGauche_next = 1;
+							(*dihedral)[arrayIndex].isGaucheGauche_previous = 1; 
+							(*dihedral)[arrayIndex1].isGaucheGauche_next = 1;
 						}
 					}
 				}
@@ -297,20 +337,21 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 	}
 }
 
-void computeCorrelation (DIHEDRAL_ENTRIES *dihedral, int nDihedrals, int nTimeframes_dump, int **lHandCorrelation, int **rHandCorrelation, int **exCoilCorrelation, int **coilCorrelation)
+void computeCorrelation (DIHEDRAL_ENTRIES *dihedral, int nDihedrals, int nTimeframes_dump, CHIRAL_CORRELATION **corr)
 {
 	int arrayIndex1, arrayIndex2, *nItems;
-	CHIRAL_CORRELATION *corr;
-	corr = (CHIRAL_CORRELATION *) malloc (nTimeframes_dump * sizeof (CHIRAL_CORRELATION));
 	nItems = (int *) calloc (nTimeframes_dump, sizeof (int));
 
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
-		corr[i].correlationTrans = 0; corr[i].correlationGauchePlus = 0; corr[i].correlationGaucheMinus = 0;
+		(*corr)[i].correlationTrans = 0; (*corr)[i].correlationGauchePlus = 0; (*corr)[i].correlationGaucheMinus = 0; (*corr)[i].correlationTransTrans = 0; (*corr)[i].correlationTransGaucheMinus = 0; (*corr)[i].correlationTransGauchePlus = 0; (*corr)[i].correlationGaucheGauche = 0;
 	}
 
+	// Autocorrelation will be calculated for all dihedrals
 	for (int currentDihedral = 0; currentDihedral < nDihedrals; ++currentDihedral)
 	{
+		printf("Computing correlation for dihedrals (%d/%d)...          \r", currentDihedral, nDihedrals);
+		fflush (stdout);
 		// Time lag
 		for (int lag = 0; lag < nTimeframes_dump; ++lag)
 		{
@@ -319,17 +360,57 @@ void computeCorrelation (DIHEDRAL_ENTRIES *dihedral, int nDihedrals, int nTimefr
 			{
 				arrayIndex1 = getIndex1d (currentElement, currentDihedral, nDihedrals);
 				arrayIndex2 = getIndex1d (currentElement + lag, currentDihedral, nDihedrals);
-				corr[lag].correlationTrans += (float)dihedral[arrayIndex1].isTrans * (float)dihedral[arrayIndex2].isTrans;
+				(*corr)[lag].correlationTrans += (float)dihedral[arrayIndex1].isTrans * (float)dihedral[arrayIndex2].isTrans;
+				(*corr)[lag].correlationGauchePlus += (float)dihedral[arrayIndex1].isGauchePlus * (float)dihedral[arrayIndex2].isGauchePlus;
+				(*corr)[lag].correlationGaucheMinus += (float)dihedral[arrayIndex1].isGaucheMinus * (float)dihedral[arrayIndex2].isGaucheMinus;
+
+				(*corr)[lag].correlationTransTrans += 
+				(float)(dihedral[arrayIndex1].isTransTrans_previous + dihedral[arrayIndex1].isTransTrans_next) * 
+				(float)(dihedral[arrayIndex2].isTransTrans_previous + dihedral[arrayIndex2].isTransTrans_next);
+
+				(*corr)[lag].correlationTransGaucheMinus += 
+				(float)(dihedral[arrayIndex1].isTransGaucheMinus_previous + dihedral[arrayIndex1].isTransGaucheMinus_next) * 
+				(float)(dihedral[arrayIndex2].isTransGaucheMinus_previous + dihedral[arrayIndex2].isTransGaucheMinus_next);
+
+				(*corr)[lag].correlationTransGauchePlus += 
+				(float)(dihedral[arrayIndex1].isTransGauchePlus_previous + dihedral[arrayIndex1].isTransGauchePlus_next) * 
+				(float)(dihedral[arrayIndex2].isTransGauchePlus_previous + dihedral[arrayIndex2].isTransGauchePlus_next);
+
+				(*corr)[lag].correlationGaucheGauche += 
+				(float)(dihedral[arrayIndex1].isGaucheGauche_previous + dihedral[arrayIndex1].isGaucheGauche_next) * 
+				(float)(dihedral[arrayIndex2].isGaucheGauche_previous + dihedral[arrayIndex2].isGaucheGauche_next);
+
 				nItems[lag]++;
 			}
 		}		
 	}
 
+	printf("\n");
+
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
-		corr[i].correlationTrans /= nItems[i];
-		corr[i].correlationTrans /= corr[0].correlationTrans;
-		printf("%f\n", corr[i].correlationTrans);
-		sleep (1);
+		(*corr)[i].correlationTrans /= nItems[i];
+		(*corr)[i].correlationTrans /= (*corr)[0].correlationTrans;
+
+		(*corr)[i].correlationGauchePlus /= nItems[i];
+		(*corr)[i].correlationGauchePlus /= (*corr)[0].correlationGauchePlus;
+
+		(*corr)[i].correlationGaucheMinus /= nItems[i];
+		(*corr)[i].correlationGaucheMinus /= (*corr)[0].correlationGaucheMinus;
+
+		(*corr)[i].correlationTransTrans /= nItems[i];
+		(*corr)[i].correlationTransTrans /= (*corr)[0].correlationTransTrans;
+
+		(*corr)[i].correlationTransGauchePlus /= nItems[i];
+		(*corr)[i].correlationTransGauchePlus /= (*corr)[0].correlationTransGauchePlus;
+
+		(*corr)[i].correlationTransGaucheMinus /= nItems[i];
+		(*corr)[i].correlationTransGaucheMinus /= (*corr)[0].correlationTransGaucheMinus;
+
+		(*corr)[i].correlationGaucheGauche /= nItems[i];
+		(*corr)[i].correlationGaucheGauche /= (*corr)[0].correlationGaucheGauche;
+
+		// printf("%f\n", corr[i].correlationTrans);
+		// sleep (1);
 	}
 }
