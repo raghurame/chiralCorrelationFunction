@@ -15,12 +15,53 @@ int main(int argc, char const *argv[])
 		exit (1);
 	}
 
+	int isXZ_dump = -1, isXZ_dihedral = -1;
+	char *pipeString;
+	pipeString = (char *) malloc (500 * sizeof (char));
+
 	FILE *inputDump, *inputDihedral, *output;
-	inputDump = fopen (argv[1], "r");
-	inputDihedral = fopen (argv[2], "r");
+
+	// Setting pointer for input dump file
+	if (strstr (argv[1], ".xz"))
+	{
+		snprintf (pipeString, 500, "xzcat %s", argv[1]); inputDump = popen (pipeString, "r"); isXZ_dump = 1;
+	}
+	else
+	{
+		inputDump = fopen (argv[1], "r"); isXZ_dump = 0;
+	}
+
+	// Setting pointer for input dihedral file
+	if (strstr (argv[2], ".xz"))
+	{
+		snprintf (pipeString, 500 , "xzcat %s", argv[2]); inputDihedral = popen (pipeString, "r"); isXZ_dihedral = 1;
+	}
+	else
+	{
+		inputDihedral = fopen (argv[2], "r"); isXZ_dihedral = 0;
+	}
+
 	output = fopen ("chiralCorrelation.output", "w");
 
 	int nAtoms = getNAtoms (inputDump), nDihedrals = getNDihedrals (inputDihedral), nTimeframes_dump = countTimeframes_dump (inputDump, nAtoms), nTimeframes_dihedral = countTimeframes_dihedral (inputDihedral, nDihedrals);
+
+	if (strstr (argv[1], ".xz"))
+	{
+		fclose (inputDump);
+		FILE *inputDump;
+		snprintf (pipeString, 500, "xzcat %s", argv[1]); 
+		inputDump = popen (pipeString, "r"); 
+		isXZ_dump = 1;
+	}
+
+	if (strstr (argv[2], ".xz"))
+	{
+		fclose (inputDihedral);
+		FILE *inputDihedral;
+		snprintf (pipeString, 500 , "xzcat %s", argv[2]); 
+		inputDihedral = popen (pipeString, "r"); 
+		isXZ_dihedral = 1;
+	}
 
 	if (nTimeframes_dump == 0)
 	{
@@ -35,6 +76,27 @@ int main(int argc, char const *argv[])
 		exit (1);
 	}
 	else printf("nTimeframes_dihedral: %d\n", nTimeframes_dihedral);
+
+	// Check the planar density distribution
+	computePlanarDensity (inputDump, nTimeframes_dump, nAtoms);
+
+	if (strstr (argv[1], ".xz"))
+	{
+		fclose (inputDump);
+		FILE *inputDump;
+		snprintf (pipeString, 500, "xzcat %s", argv[1]); 
+		inputDump = popen (pipeString, "r"); 
+		isXZ_dump = 1;
+	}
+	
+	if (strstr (argv[2], ".xz"))
+	{
+		fclose (inputDihedral);
+		FILE *inputDihedral;
+		snprintf (pipeString, 500 , "xzcat %s", argv[2]); 
+		inputDihedral = popen (pipeString, "r"); 
+		isXZ_dihedral = 1;
+	}
 
 	// Initializing structs to store dump and dihedral values
 	// Dihedral values from all timesteps will be stored in a single struct
@@ -52,6 +114,10 @@ int main(int argc, char const *argv[])
 		printf("Reading dihedral frame: %d/%d               \r", i, nTimeframes_dump);
 		fflush (stdout);
 		dump = readDump (inputDump, nAtoms, &currentTimestep_dump);
+
+		// TO DO:
+		// Ask the user to enter xlo, xhi, ylo, yhi, zlo, zhi.
+		// If the dihedral falls outside the boundary, then don't assign chirality values
 		readDihedral (&dihedral, inputDihedral, dump, i, nDihedrals, nAtoms, currentTimestep_dump, &currentTimestep_dihedral);
 	}
 

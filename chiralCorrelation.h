@@ -9,5 +9,6 @@ DUMP_ENTRIES *readDump (FILE *inputDump, int nAtoms, int *currentTimestep_dump);
 int getIndex1d (int i, int j, int width);
 int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES *dump, int currentStep, int nDihedrals, int nAtoms, int currentTimestep_dump, int *currentTimestep_dihedral);
 void computeCorrelation (DIHEDRAL_ENTRIES *dihedral, int nDihedrals, int nTimeframes_dump, CHIRAL_CORRELATION **corr);
+void computePlanarDensity (FILE *inputDump, int nTimeframes_dump, int nAtoms);
 
 #endif

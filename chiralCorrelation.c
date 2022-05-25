@@ -7,6 +7,95 @@
 #include "structDefinitions.h"
 #include "chiralCorrelation.h"
 
+void computePlanarDensity (FILE *inputDump, int nTimeframes_dump, int nAtoms)
+{
+	rewind (inputDump);
+
+	char lineString[2000];
+	SIM_BOUNDARY bounds;
+	bounds.xlo = 0; bounds.ylo = 0; bounds.zlo = 0; bounds.xhi = 0; bounds.yhi = 0; bounds.zhi = 0; bounds.xLength = 0; bounds.yLength = 0; bounds.zLength = 0;
+	int *xBins, *yBins, *zBins, nXBins = 0, nYBins = 0, nZBins = 0, atomType;
+	float xBinLength = 3, yBinLength = 3, zBinLength = 3, xCoord, yCoord, zCoord;
+
+	printf("Entered computePlanarDensity function...\n");
+
+	for (int i = 0; i < nTimeframes_dump; ++i)
+	{
+		for (int j = 0; j < 9; ++j)
+		{
+			fgets (lineString, 2000, inputDump);
+			if (j == 5 && bounds.xlo == 0 && bounds.xhi == 0) { sscanf (lineString, "%f %f\n", &bounds.xlo, &bounds.xhi); }
+			if (j == 6 && bounds.ylo == 0 && bounds.yhi == 0) { sscanf (lineString, "%f %f\n", &bounds.ylo, &bounds.yhi); }
+			if (j == 7 && bounds.zlo == 0 && bounds.zhi == 0) { sscanf (lineString, "%f %f\n", &bounds.zlo, &bounds.zhi); }
+		}
+
+		for (int j = 0; j < nAtoms; ++j)
+		{
+			if ((j == 0) && (nXBins == 0) && (nYBins == 0) && (nZBins == 0))
+			{
+				printf("xlo %f\txhi %f\nylo %f\tyhi %f\nzlo %f\tzhi %f\n", bounds.xlo, bounds.xhi, bounds.ylo, bounds.yhi, bounds.zlo, bounds.zhi);
+				bounds.xLength = bounds.xhi - bounds.xlo;
+				bounds.yLength = bounds.yhi - bounds.ylo;
+				bounds.zLength = bounds.zhi - bounds.zlo;
+
+				nXBins = (int) ceil (bounds.xLength / xBinLength);
+				nYBins = (int) ceil (bounds.yLength / yBinLength);
+				nZBins = (int) ceil (bounds.zLength / zBinLength);
+
+				printf(" nXBins: %d\n nYBins: %d\n nZBins: %d\n", nXBins, nYBins, nZBins);
+
+				xBins = (int *) calloc (nXBins, sizeof (int));
+				yBins = (int *) calloc (nYBins, sizeof (int));
+				zBins = (int *) calloc (nZBins, sizeof (int));
+			}
+
+			fgets (lineString, 2000, inputDump);
+			sscanf (lineString, "%*d %*d %d %f %f %f\n", &atomType, &xCoord, &yCoord, &zCoord);
+
+			if (atomType == 1 || atomType == 2)
+			{
+				for (int k = 0; k < nXBins; ++k)
+				{
+					if (xCoord > (xBinLength * k) && xCoord <= (xBinLength * (k + 1))) { xBins[k]++; break; }
+				}
+
+				for (int k = 0; k < nYBins; ++k)
+				{
+					if (yCoord > (yBinLength * k) && yCoord <= (yBinLength * (k + 1))) { yBins[k]++; break; }
+				}
+
+				for (int k = 0; k < nZBins; ++k)
+				{
+					if (zCoord > (zBinLength * k) && zCoord <= (zBinLength * (k + 1))) { zBins[k]++; break; }
+				}
+			}
+		}
+
+		printf("Calculating density distribution: %d/%d           \r", i, nTimeframes_dump);
+		fflush (stdout);
+	}
+
+	rewind (inputDump);
+
+	FILE *xDistributionOutput, *yDistributionOutput, *zDistributionOutput;
+	xDistributionOutput = fopen ("xDistribution.output", "w");
+	yDistributionOutput = fopen ("yDistribution.output", "w");
+	zDistributionOutput = fopen ("zDistribution.output", "w");
+
+	int xBins_max = 0, yBins_max = 0, zBins_max = 0;
+
+	for (int i = 0; i < nXBins; ++i) { if (xBins[i] > xBins_max) xBins_max = xBins[i]; }
+	for (int i = 0; i < nYBins; ++i) { if (yBins[i] > yBins_max) yBins_max = yBins[i]; }
+	for (int i = 0; i < nZBins; ++i) { if (zBins[i] > zBins_max) zBins_max = zBins[i]; }
+
+	for (int i = 0; i < nXBins; ++i) fprintf(xDistributionOutput, "%f %d\n", (xBinLength * i), xBins[i]);
+	for (int i = 0; i < nYBins; ++i) fprintf(yDistributionOutput, "%f %d\n", (yBinLength * i), yBins[i]);
+	for (int i = 0; i < nZBins; ++i) fprintf(zDistributionOutput, "%f %d\n", (zBinLength * i), zBins[i]);
+
+	fclose (xDistributionOutput);
+	fclose (yDistributionOutput);
+	fclose (zDistributionOutput);
+}
 
 int getNAtoms (FILE *inputDump)
 {
