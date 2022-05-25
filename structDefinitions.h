@@ -1,6 +1,11 @@
 #ifndef CHIRALCORRELATION_STRUCTS_H
 #define CHIRALCORRELATION_STRUCTS_H
 
+typedef struct simBoundary
+{
+	float xlo, xhi, ylo, yhi, zlo, zhi, xLength, yLength, zLength;
+} SIM_BOUNDARY;
+
 typedef struct dumpEntries
 {
 	int id, molType, atomType, ix, iy, iz;
