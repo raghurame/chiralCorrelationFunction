@@ -109,16 +109,23 @@ int main(int argc, char const *argv[])
 	// Reading and storing all dihedral data
 	rewind (inputDump);
 	rewind (inputDihedral);
+
+	SIM_BOUNDARY regionOfInterest;
+	printf("\nEnter the region of interest. Only the atoms that fall within this region will be considered for further analysis.\n");
+	printf("\nxlo: "); scanf ("%f", &regionOfInterest.xlo); printf("\n");
+	printf("xhi: "); scanf ("%f", &regionOfInterest.xhi); printf("\n");
+	printf("ylo: "); scanf ("%f", &regionOfInterest.ylo); printf("\n");
+	printf("yhi: "); scanf ("%f", &regionOfInterest.yhi); printf("\n");
+	printf("zlo: "); scanf ("%f", &regionOfInterest.zlo); printf("\n");
+	printf("zhi: "); scanf ("%f", &regionOfInterest.zhi); printf("\n");
+
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
 		printf("Reading dihedral frame: %d/%d               \r", i, nTimeframes_dump);
 		fflush (stdout);
 		dump = readDump (inputDump, nAtoms, &currentTimestep_dump);
 
-		// TO DO:
-		// Ask the user to enter xlo, xhi, ylo, yhi, zlo, zhi.
-		// If the dihedral falls outside the boundary, then don't assign chirality values
-		readDihedral (&dihedral, inputDihedral, dump, i, nDihedrals, nAtoms, currentTimestep_dump, &currentTimestep_dihedral);
+		readDihedral (&dihedral, inputDihedral, dump, i, nDihedrals, nAtoms, currentTimestep_dump, &currentTimestep_dihedral, regionOfInterest);
 	}
 
 	printf("\n");

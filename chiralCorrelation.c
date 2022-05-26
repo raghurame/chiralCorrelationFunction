@@ -225,12 +225,14 @@ int getIndex1d (int i, int j, int width)
 	return index1d;
 }
 
-int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES *dump, int currentStep, int nDihedrals, int nAtoms, int currentTimestep_dump, int *currentTimestep_dihedral)
+int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES *dump, int currentStep, int nDihedrals, int nAtoms, int currentTimestep_dump, int *currentTimestep_dihedral, SIM_BOUNDARY regionOfInterest)
 {
 	char lineString[2000];
 	int dihAtom1, dihAtom2, dihAtom3, dihAtom4, dihAtom1Type, dihAtom2Type, dihAtom3Type, dihAtom4Type, arrayIndex, arrayIndex1;
 	DIHEDRAL_ENTRIES *dihTemp;
 	dihTemp = (DIHEDRAL_ENTRIES *) malloc (nDihedrals * sizeof (DIHEDRAL_ENTRIES));
+
+	COORDINATES atom1coords, atom2coords, atom3coords, atom4coords;
 
 	while (fgets (lineString, 2000, inputDihedral) != NULL)
 	{
@@ -291,6 +293,19 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 		dihAtom3 = (*dihedral)[arrayIndex].atom3;
 		dihAtom4 = (*dihedral)[arrayIndex].atom4;
 
+		atom1coords.x = dump[dihAtom1 - 1].x;
+		atom1coords.y = dump[dihAtom1 - 1].y;
+		atom1coords.z = dump[dihAtom1 - 1].z;
+		atom2coords.x = dump[dihAtom2 - 1].x;
+		atom2coords.y = dump[dihAtom2 - 1].y;
+		atom2coords.z = dump[dihAtom2 - 1].z;
+		atom3coords.x = dump[dihAtom3 - 1].x;
+		atom3coords.y = dump[dihAtom3 - 1].y;
+		atom3coords.z = dump[dihAtom3 - 1].z;
+		atom4coords.x = dump[dihAtom4 - 1].x;
+		atom4coords.y = dump[dihAtom4 - 1].y;
+		atom4coords.z = dump[dihAtom4 - 1].z;
+
 		dihAtom1Type = dump[dihAtom1 - 1].atomType;
 		dihAtom2Type = dump[dihAtom2 - 1].atomType;
 		dihAtom3Type = dump[dihAtom3 - 1].atomType;
@@ -312,9 +327,63 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 		(*dihedral)[arrayIndex].isTransGaucheMinus_next = 0; 
 		(*dihedral)[arrayIndex].isGaucheGauche_next = 0;
 
-		if (((*dihedral)[arrayIndex].angle < -38) && ((*dihedral)[arrayIndex].angle > -116)) (*dihedral)[arrayIndex].isGaucheMinus = 1;
-		else if (((*dihedral)[arrayIndex].angle > 34) && ((*dihedral)[arrayIndex].angle < 115)) (*dihedral)[arrayIndex].isGauchePlus = 1;
-		else if ((((*dihedral)[arrayIndex].angle < -117) && ((*dihedral)[arrayIndex].angle > -180)) || (((*dihedral)[arrayIndex].angle < 180) && ((*dihedral)[arrayIndex].angle > 116))) (*dihedral)[arrayIndex].isTrans = 1;
+		if (
+			((*dihedral)[arrayIndex].angle < -38) && 
+			((*dihedral)[arrayIndex].angle > -116) && 
+			(atom2coords.x > regionOfInterest.xlo) && 
+			(atom2coords.x < regionOfInterest.xhi) && 
+			(atom2coords.y > regionOfInterest.ylo) && 
+			(atom2coords.y < regionOfInterest.yhi) && 
+			(atom2coords.z > regionOfInterest.zlo) && 
+			(atom2coords.z < regionOfInterest.zhi) && 
+			(atom3coords.x > regionOfInterest.xlo) && 
+			(atom3coords.x < regionOfInterest.xhi) && 
+			(atom3coords.y > regionOfInterest.ylo) && 
+			(atom3coords.y < regionOfInterest.yhi) && 
+			(atom3coords.z > regionOfInterest.zlo) && 
+			(atom3coords.z < regionOfInterest.zhi)
+			)
+		{
+			(*dihedral)[arrayIndex].isGaucheMinus = 1;
+		}
+		else if (
+			((*dihedral)[arrayIndex].angle > 34) && 
+			((*dihedral)[arrayIndex].angle < 115) && 
+			(atom2coords.x > regionOfInterest.xlo) && 
+			(atom2coords.x < regionOfInterest.xhi) && 
+			(atom2coords.y > regionOfInterest.ylo) && 
+			(atom2coords.y < regionOfInterest.yhi) && 
+			(atom2coords.z > regionOfInterest.zlo) && 
+			(atom2coords.z < regionOfInterest.zhi) && 
+			(atom3coords.x > regionOfInterest.xlo) && 
+			(atom3coords.x < regionOfInterest.xhi) && 
+			(atom3coords.y > regionOfInterest.ylo) && 
+			(atom3coords.y < regionOfInterest.yhi) && 
+			(atom3coords.z > regionOfInterest.zlo) && 
+			(atom3coords.z < regionOfInterest.zhi)
+			)
+		{
+			(*dihedral)[arrayIndex].isGauchePlus = 1;
+		}
+		else if (
+			((((*dihedral)[arrayIndex].angle < -117) && ((*dihedral)[arrayIndex].angle > -180)) || 
+			(((*dihedral)[arrayIndex].angle < 180) && ((*dihedral)[arrayIndex].angle > 116))) && 
+			(atom2coords.x > regionOfInterest.xlo) && 
+			(atom2coords.x < regionOfInterest.xhi) && 
+			(atom2coords.y > regionOfInterest.ylo) && 
+			(atom2coords.y < regionOfInterest.yhi) && 
+			(atom2coords.z > regionOfInterest.zlo) && 
+			(atom2coords.z < regionOfInterest.zhi) && 
+			(atom3coords.x > regionOfInterest.xlo) && 
+			(atom3coords.x < regionOfInterest.xhi) && 
+			(atom3coords.y > regionOfInterest.ylo) && 
+			(atom3coords.y < regionOfInterest.yhi) && 
+			(atom3coords.z > regionOfInterest.zlo) && 
+			(atom3coords.z < regionOfInterest.zhi)
+			)
+		{
+			(*dihedral)[arrayIndex].isTrans = 1;
+		}
 	}
 
 	// Assigning isTransTrans, isTransGauchePlus, isTransGaucheMinus, isGaucheGauche
