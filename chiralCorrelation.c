@@ -56,17 +56,29 @@ void computePlanarDensity (FILE *inputDump, int nTimeframes_dump, int nAtoms)
 			{
 				for (int k = 0; k < nXBins; ++k)
 				{
-					if (xCoord > ((xBinLength * k) - bounds.xlo) && xCoord <= ((xBinLength * (k + 1)) - bounds.xlo)) { xBins[k]++; break; }
+					if (xCoord > (bounds.xlo + (k * xBinLength)) && xCoord <= (bounds.xlo + ((k + 1) * xBinLength)))
+					{ 
+						xBins[k]++; 
+						break;
+					}
 				}
 
 				for (int k = 0; k < nYBins; ++k)
 				{
-					if (yCoord > ((yBinLength * k) - bounds.ylo) && yCoord <= ((yBinLength * (k + 1)) - bounds.ylo)) { yBins[k]++; break; }
+					if (yCoord > (bounds.ylo + (k * yBinLength)) && yCoord <= (bounds.ylo + ((k + 1) * yBinLength)))
+					{ 
+						yBins[k]++; 
+						break; 
+					}
 				}
 
 				for (int k = 0; k < nZBins; ++k)
 				{
-					if (zCoord > ((zBinLength * k) - bounds.zlo) && zCoord <= ((zBinLength * (k + 1)) - bounds.zlo)) { zBins[k]++; break; }
+					if (zCoord > (bounds.zlo + (k * zBinLength)) && zCoord <= (bounds.zlo + ((k + 1) * zBinLength))) 
+					{ 
+						zBins[k]++; 
+						break; 
+					}
 				}
 			}
 		}
@@ -88,9 +100,9 @@ void computePlanarDensity (FILE *inputDump, int nTimeframes_dump, int nAtoms)
 	for (int i = 0; i < nYBins; ++i) { if (yBins[i] > yBins_max) yBins_max = yBins[i]; }
 	for (int i = 0; i < nZBins; ++i) { if (zBins[i] > zBins_max) zBins_max = zBins[i]; }
 
-	for (int i = 0; i < nXBins; ++i) fprintf(xDistributionOutput, "%f %d\n", (xBinLength * i), xBins[i]);
-	for (int i = 0; i < nYBins; ++i) fprintf(yDistributionOutput, "%f %d\n", (yBinLength * i), yBins[i]);
-	for (int i = 0; i < nZBins; ++i) fprintf(zDistributionOutput, "%f %d\n", (zBinLength * i), zBins[i]);
+	for (int i = 0; i < nXBins; ++i) fprintf(xDistributionOutput, "%f %d\n", bounds.xlo + (i * xBinLength), xBins[i]);
+	for (int i = 0; i < nYBins; ++i) fprintf(yDistributionOutput, "%f %d\n", bounds.ylo + (i * yBinLength), yBins[i]);
+	for (int i = 0; i < nZBins; ++i) fprintf(zDistributionOutput, "%f %d\n", bounds.zlo + (i * zBinLength), zBins[i]);
 
 	fclose (xDistributionOutput);
 	fclose (yDistributionOutput);
