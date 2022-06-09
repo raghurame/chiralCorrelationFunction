@@ -56,17 +56,17 @@ void computePlanarDensity (FILE *inputDump, int nTimeframes_dump, int nAtoms)
 			{
 				for (int k = 0; k < nXBins; ++k)
 				{
-					if (xCoord > (xBinLength * k) && xCoord <= (xBinLength * (k + 1))) { xBins[k]++; break; }
+					if (xCoord > ((xBinLength * k) - bounds.xlo) && xCoord <= ((xBinLength * (k + 1)) - bounds.xlo)) { xBins[k]++; break; }
 				}
 
 				for (int k = 0; k < nYBins; ++k)
 				{
-					if (yCoord > (yBinLength * k) && yCoord <= (yBinLength * (k + 1))) { yBins[k]++; break; }
+					if (yCoord > ((yBinLength * k) - bounds.ylo) && yCoord <= ((yBinLength * (k + 1)) - bounds.ylo)) { yBins[k]++; break; }
 				}
 
 				for (int k = 0; k < nZBins; ++k)
 				{
-					if (zCoord > (zBinLength * k) && zCoord <= (zBinLength * (k + 1))) { zBins[k]++; break; }
+					if (zCoord > ((zBinLength * k) - bounds.zlo) && zCoord <= ((zBinLength * (k + 1)) - bounds.zlo)) { zBins[k]++; break; }
 				}
 			}
 		}

@@ -110,14 +110,25 @@ int main(int argc, char const *argv[])
 	rewind (inputDump);
 	rewind (inputDihedral);
 
+	int regionNecessary = 1;
+	if (nAtoms < 2000) regionNecessary = 0;
+
 	SIM_BOUNDARY regionOfInterest;
-	printf("\nEnter the region of interest. Only the atoms that fall within this region will be considered for further analysis.\n");
-	printf("\nxlo: "); scanf ("%f", &regionOfInterest.xlo); printf("\n");
-	printf("xhi: "); scanf ("%f", &regionOfInterest.xhi); printf("\n");
-	printf("ylo: "); scanf ("%f", &regionOfInterest.ylo); printf("\n");
-	printf("yhi: "); scanf ("%f", &regionOfInterest.yhi); printf("\n");
-	printf("zlo: "); scanf ("%f", &regionOfInterest.zlo); printf("\n");
-	printf("zhi: "); scanf ("%f", &regionOfInterest.zhi); printf("\n");
+	if (regionNecessary == 1)
+	{
+		printf("\nEnter the region of interest. Only the atoms that fall within this region will be considered for further analysis.\n");
+		printf("\nxlo: "); scanf ("%f", &regionOfInterest.xlo); printf("\n");
+		printf("xhi: "); scanf ("%f", &regionOfInterest.xhi); printf("\n");
+		printf("ylo: "); scanf ("%f", &regionOfInterest.ylo); printf("\n");
+		printf("yhi: "); scanf ("%f", &regionOfInterest.yhi); printf("\n");
+		printf("zlo: "); scanf ("%f", &regionOfInterest.zlo); printf("\n");
+		printf("zhi: "); scanf ("%f", &regionOfInterest.zhi); printf("\n");
+	}
+	else
+	{
+		regionOfInterest.xlo = -3000; regionOfInterest.ylo = -3000; regionOfInterest.zlo = -3000;
+		regionOfInterest.xhi = 3000; regionOfInterest.yhi = 3000; regionOfInterest.zhi = 3000;
+	}
 
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
@@ -133,6 +144,9 @@ int main(int argc, char const *argv[])
 	CHIRAL_CORRELATION *corr;
 	corr = (CHIRAL_CORRELATION *) malloc (nTimeframes_dump * sizeof (CHIRAL_CORRELATION));
 	computeCorrelation (dihedral, nDihedrals, nTimeframes_dump, &corr);
+
+	// Printing header information
+	fprintf(output, "t gp gm tt tgm tgp gg\n");
 
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
