@@ -505,6 +505,8 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 			}
 		}
 	}
+
+	free (dihTemp);
 }
 
 void computeCorrelation (DIHEDRAL_ENTRIES *dihedral, int nDihedrals, int nTimeframes_dump, CHIRAL_CORRELATION **corr)
