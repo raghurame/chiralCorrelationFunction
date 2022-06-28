@@ -132,8 +132,8 @@ int main(int argc, char const *argv[])
 
 	for (int i = 0; i < nTimeframes_dump; ++i)
 	{
-		printf("Reading dihedral frame: %d/%d               \r", i, nTimeframes_dump);
-		fflush (stdout);
+		// printf("Reading dihedral frame: %d/%d               \r", i, nTimeframes_dump);
+		// fflush (stdout);
 		dump = readDump (inputDump, nAtoms, &currentTimestep_dump);
 
 		readDihedral (&dihedral, inputDihedral, dump, i, nDihedrals, nAtoms, currentTimestep_dump, &currentTimestep_dihedral, regionOfInterest);
