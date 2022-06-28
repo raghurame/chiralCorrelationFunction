@@ -160,17 +160,17 @@ int countTimeframes_dump (FILE *inputDump, int nAtoms)
 		if (strstr (lineString, "ITEM: TIMESTEP"))
 		{
 			nTimeframes++;
-			printf("Counting dump timeframes: %d        \r", nTimeframes);
-			fflush (stdout);			
+			// printf("Counting dump timeframes: %d        \r", nTimeframes);
+			// fflush (stdout);			
 		}
 	}
 
 	printf("\n");
 
-	if ((nLines / (nAtoms + 9)) == nTimeframes)
+	// if ((nLines / (nAtoms + 9)) == nTimeframes)
 		return nTimeframes;
-	else
-		return 0;
+	// else
+	// 	return 0;
 }
 
 int countTimeframes_dihedral (FILE *inputDihedral, int nDihedrals)
@@ -186,19 +186,17 @@ int countTimeframes_dihedral (FILE *inputDihedral, int nDihedrals)
 		if (strstr (lineString, "ITEM: TIMESTEP"))
 		{
 			nTimeframes++;
-			printf("Counting dihedral timeframes: %d         \r", nTimeframes);
-			fflush (stdout);
+			// printf("Counting dihedral timeframes: %d         \r", nTimeframes);
+			// fflush (stdout);
 		}
 	}
 
-	printf("\n");
+	// printf("\n");
 
-	if ((nLines / (nDihedrals + 9)) == nTimeframes)
+	// if ((nLines / (nDihedrals + 9)) == nTimeframes)
 		return nTimeframes;
-	else
-		return 0;
-
-	return nTimeframes;
+	// else
+	// 	return 0;
 }
 
 DUMP_ENTRIES *readDump (FILE *inputDump, int nAtoms, int *currentTimestep_dump)
@@ -272,7 +270,7 @@ int readDihedral (DIHEDRAL_ENTRIES **dihedral, FILE *inputDihedral, DUMP_ENTRIES
 		}
 	}
 
-	processFurther:
+	processFurther: ;
 
 	// Re-arranging the dihedral entries in ascending order
 	int currentDihID = 0;
